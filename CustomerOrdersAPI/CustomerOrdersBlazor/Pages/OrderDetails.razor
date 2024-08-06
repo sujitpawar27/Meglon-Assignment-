@@ -1,0 +1,60 @@
+﻿@inject HttpClient httpClient
+@page "/orderdetails/{customerId}"
+@using CustomerOrdersBlazor.Services;
+@inject OrderService OrderService
+@using CustomerOrdersAPI.Model
+
+
+@if (orders == null || @customerId == null)
+{
+    <tr>
+        <td colspan="3">Loading...</td>
+    </tr>
+}
+else 
+{ 
+
+    <h3>Order Details for @customerId</h3>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Item</th>
+                <th>Price</th>
+               
+            </tr>
+        </thead>
+        <tbody>
+                @foreach (var order in orders)
+                {
+                    <tr>
+                        <td>@order.OrderID</td>
+                        <td>@order.ItemName</td>
+                        <td>@order.ItemPrice.ToString("C")</td>
+                    </tr>
+                }
+            
+        </tbody>
+    </table>
+}
+
+@code {
+   
+    [Parameter]
+    public String customerId { get; set; }
+
+    private List<Order> orders;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            orders = (await OrderService.GetOrdersByCustomerId(customerId)).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
+    }
+}
